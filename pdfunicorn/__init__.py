@@ -75,7 +75,7 @@ class Documents(object):
 
 class UserAgent(object):
     
-    def __init__(self, api_key, base_url='api.pdfunicorn.com'):
+    def __init__(self, api_key, base_url='pdfunicorn.com'):
         self.base_url = base_url
         self.api_key = api_key
         self.session = requests.Session()
