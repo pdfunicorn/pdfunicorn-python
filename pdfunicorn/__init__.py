@@ -28,8 +28,8 @@ class pdfUnicorn(object):
     pdf_doc = client.documents.create(file='path/to/doc/source.pdfu');
     
     """
-    def __init__(self, api_key, base_url=None):
-        self.ua = UserAgent(api_key, base_url=base_url)
+    def __init__(self, api_key, base_url=None, verify=None):
+        self.ua = UserAgent(api_key, base_url=base_url, verify=verify)
         self.images = Images(self.ua)
         self.documents = Documents(self.ua)
 
@@ -40,12 +40,6 @@ class Images(object):
         self.ua = ua
 
     def create(self, image, src=None):
-#         if isinstance(image, str):
-#             return self.ua.post(
-#                 'v1/images',
-#                 files = {'file': (src, open(image, 'rb'))}
-#             ).json
-#         else:
         return self.ua.post(
             'v1/images',
             files = { 'image': (src, image) }
@@ -75,11 +69,12 @@ class Documents(object):
 
 class UserAgent(object):
     
-    def __init__(self, api_key, base_url='pdfunicorn.com'):
+    def __init__(self, api_key, base_url='pdfunicorn.com', verify=True):
         self.base_url = base_url
         self.api_key = api_key
         self.session = requests.Session()
-
+        self.verify = verify
+        
 
     def get(self):
         pass
@@ -91,18 +86,21 @@ class UserAgent(object):
                 self.base_url + '/' + uri,
                 auth = HTTPBasicAuth(self.api_key,''),
                 params = params,
+                verify = self.verify
             )
         elif data:
             resp = self.session.post(
                 self.base_url + '/' + uri,
                 auth = HTTPBasicAuth(self.api_key,''),
                 data = data,
+                verify = self.verify
             )
         else:
             resp = self.session.post(
                 self.base_url + '/' + uri,
                 auth = HTTPBasicAuth(self.api_key,''),
-                files = files
+                files = files,
+                verify = self.verify
             )
         #resp.raise_for_status()
         return resp
@@ -121,7 +119,7 @@ image_base64='/9j/4AAQSkZJRgABAQEAWgBYAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw
 class PDFUTestBase(unittest.TestCase):
     
     def setUp(self):
-        self.pdfu = pdfUnicorn(api_key='testers-api-key', base_url='https://pdfunicorn.com')
+        self.pdfu = pdfUnicorn(api_key='my-api-key', base_url='https://pdfunicorn.com', verify=False)
 
             
 class TestClient(PDFUTestBase):
