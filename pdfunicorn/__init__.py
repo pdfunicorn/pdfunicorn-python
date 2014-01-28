@@ -42,7 +42,7 @@ class Images(object):
     def create(self, image, src=None):
 #         if isinstance(image, str):
 #             return self.ua.post(
-#                 'api/v1/images',
+#                 'v1/images',
 #                 files = {'file': (src, open(image, 'rb'))}
 #             ).json
 #         else:
@@ -58,8 +58,8 @@ class Documents(object):
     def __init__(self, ua):
         self.ua = ua
 
-    def create(self, source, binary):
-        resp = self.ua.post('v1/documents'+('.binary' if binary else ''), data=json.dumps({
+    def create(self, source, pdf):
+        resp = self.ua.post('v1/documents'+('.pdf' if pdf else ''), data=json.dumps({
             'source': source if '<doc' in source else open(source, 'rb').read()
         }))
         if resp.status_code == 200:
@@ -121,7 +121,7 @@ image_base64='/9j/4AAQSkZJRgABAQEAWgBYAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw
 class PDFUTestBase(unittest.TestCase):
     
     def setUp(self):
-        self.pdfu = pdfUnicorn(api_key='testers-api-key', base_url='http://localhost:3000')
+        self.pdfu = pdfUnicorn(api_key='testers-api-key', base_url='https://pdfunicorn.com')
 
             
 class TestClient(PDFUTestBase):
@@ -141,7 +141,7 @@ class TestClient(PDFUTestBase):
         
         doc = self.pdfu.documents.create(
             source = '<doc size="b5"><page><row><cell>Hello World!</cell><cell><img src="path/to/test_image.jpg" /></cell></row></page></doc>',
-            binary = True
+            pdf = True
         )
         self.assertTrue(re.match('%PDF', doc))
                         
