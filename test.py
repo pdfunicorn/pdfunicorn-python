@@ -22,7 +22,8 @@ image_base64='/9j/4AAQSkZJRgABAQEAWgBYAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw
 class PDFUTestBase(unittest.TestCase):
     
     def setUp(self):
-        self.pdfu = pdfUnicorn(api_key=API_KEY, base_url='https://pdfunicorn.com', verify=False)
+        #self.pdfu = pdfUnicorn(api_key=API_KEY, base_url='https://pdfunicorn.com', verify=False)
+        self.pdfu = pdfUnicorn(api_key=API_KEY, base_url='http://localhost:3000', verify=False)
 
             
 class TestClient(PDFUTestBase):
@@ -35,8 +36,17 @@ class TestClient(PDFUTestBase):
         img = self.pdfu.images.create(image, 'path/to/test_image.jpg')
 
         self.assertTrue(img)
+        self.assertTrue(img.get('id'))
+        self.assertTrue(img.get('created'))
         self.assertEqual(img.get('src'), 'path/to/test_image.jpg')
         self.assertEqual(img.get('uri'), '/v1/images/' + img.get('id'))
+        
+        try:
+            img = self.pdfu.documents.create({})
+        except InvalidRequestError as e:
+            self.assertEqual(
+                e.errors, ['Document - Missing required attribute value: "source"']
+            )
         
         doc = self.pdfu.documents.create(
             source = '<doc size="b5"><page><row><cell>Hello World!</cell><cell><img src="path/to/test_image.jpg" /></cell></row></page></doc>',
